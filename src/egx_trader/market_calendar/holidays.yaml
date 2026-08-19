@@ -1,0 +1,140 @@
+# EGX non-trading days and special session hours.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# HOW THIS FILE WAS BUILT, AND WHY IT IS NOT A LIST OF EGYPTIAN PUBLIC HOLIDAYS.
+#
+# The exchange's calendar and the country's public holidays are NOT the same
+# list, and assuming they were produced real bugs. Measured against the trading
+# record: EGX was OPEN on 2026-01-25 (Police Day, 75% of liquid names traded)
+# and on 2026-06-30 (June 30 Revolution, 56%) — yet CLOSED on both of those
+# dates in 2024. The same nominal holiday is a trading day in one year and not
+# the next, so no rule derived from the public-holiday list can be correct.
+#
+# These dates are therefore DERIVED FROM EVIDENCE, not from a holiday list: a
+# date is recorded closed when ZERO of 16 index-weighted, liquid EGX names have
+# a bar for it. The feed loses roughly 22-30% of sessions at random, so a single
+# name missing a day means nothing — but all 16 missing the same day essentially
+# never happens by chance. Rebuild or extend with `egx verify-calendar`.
+#
+# The derived set lands exactly on Eid al-Fitr, Eid al-Adha, Coptic Christmas,
+# Sham El-Nessim, Mawlid and Islamic New Year across four years, which is the
+# cross-check that this method works. Where a date maps unambiguously onto a
+# known observance it is named; where it does not, it stays generic rather than
+# inventing a name for it.
+#
+# CONFIDENCE: this is inferred from a lossy third-party feed, not read from an
+# exchange publication. Reconcile against EGX's own published calendar when you
+# can get it. Past `verified_through`, strict lookups raise rather than guess,
+# because a missing holiday corrupts settlement dates and makes the system
+# believe an unsettled lot is sellable.
+# ─────────────────────────────────────────────────────────────────────────────
+
+verified_through: 2026-08-13
+
+holidays:
+  2021-10-07: EGX closed (observance not identified)
+  2021-10-21: EGX closed (observance not identified)
+  2022-01-06: EGX closed (observance not identified)
+  2022-01-27: EGX closed (observance not identified)
+  2022-04-24: EGX closed (observance not identified)
+  2022-04-25: Sinai Liberation Day
+  2022-05-01: Labour Day
+  2022-05-02: EGX closed (observance not identified)
+  2022-05-03: EGX closed (observance not identified)
+  2022-05-04: EGX closed (observance not identified)
+  2022-05-05: EGX closed (observance not identified)
+  2022-06-30: June 30 Revolution
+  2022-07-10: EGX closed (observance not identified)
+  2022-07-11: EGX closed (observance not identified)
+  2022-07-12: EGX closed (observance not identified)
+  2022-07-13: EGX closed (observance not identified)
+  2022-07-14: EGX closed (observance not identified)
+  2022-10-06: Armed Forces Day
+  2023-01-01: New Year's Day
+  2023-01-08: EGX closed (observance not identified)
+  2023-01-26: EGX closed (observance not identified)
+  2023-04-16: EGX closed (observance not identified)
+  2023-04-17: EGX closed (observance not identified)
+  2023-04-20: EGX closed (observance not identified)
+  2023-04-23: EGX closed (observance not identified)
+  2023-04-24: EGX closed (observance not identified)
+  2023-04-25: Sinai Liberation Day
+  2023-05-04: EGX closed (observance not identified)
+  2023-06-27: EGX closed (observance not identified)
+  2023-06-28: EGX closed (observance not identified)
+  2023-06-29: EGX closed (observance not identified)
+  2023-07-02: EGX closed (observance not identified)
+  2023-07-03: EGX closed (observance not identified)
+  2023-07-20: EGX closed (observance not identified)
+  2023-07-23: July 23 Revolution
+  2023-09-28: EGX closed (observance not identified)
+  2023-10-05: EGX closed (observance not identified)
+  2024-01-01: New Year's Day
+  2024-01-07: Coptic Christmas
+  2024-01-25: Revolution Day / National Police Day
+  2024-04-09: EGX closed (observance not identified)
+  2024-04-10: EGX closed (observance not identified)
+  2024-04-11: EGX closed (observance not identified)
+  2024-04-14: EGX closed (observance not identified)
+  2024-04-25: Sinai Liberation Day
+  2024-05-05: EGX closed (observance not identified)
+  2024-05-06: EGX closed (observance not identified)
+  2024-06-16: EGX closed (observance not identified)
+  2024-06-17: EGX closed (observance not identified)
+  2024-06-18: EGX closed (observance not identified)
+  2024-06-19: EGX closed (observance not identified)
+  2024-06-20: EGX closed (observance not identified)
+  2024-06-30: June 30 Revolution
+  2024-07-01: EGX closed (observance not identified)
+  2024-07-11: EGX closed (observance not identified)
+  2024-07-25: EGX closed (observance not identified)
+  2024-09-15: EGX closed (observance not identified)
+  2024-10-06: Armed Forces Day
+  2025-01-01: New Year's Day
+  2025-01-07: Coptic Christmas
+  2025-03-30: EGX closed (observance not identified)
+  2025-03-31: EGX closed (observance not identified)
+  2025-04-01: EGX closed (observance not identified)
+  2025-04-02: EGX closed (observance not identified)
+  2025-04-06: EGX closed (observance not identified)
+  2025-04-10: EGX closed (observance not identified)
+  2025-04-20: EGX closed (observance not identified)
+  2025-04-21: EGX closed (observance not identified)
+  2025-04-24: EGX closed (observance not identified)
+  2025-05-01: Labour Day
+  2025-06-05: EGX closed (observance not identified)
+  2025-06-08: EGX closed (observance not identified)
+  2025-06-09: EGX closed (observance not identified)
+  2025-06-15: EGX closed (observance not identified)
+  2025-06-26: EGX closed (observance not identified)
+  2025-07-03: EGX closed (observance not identified)
+  2025-07-08: EGX closed (observance not identified)
+  2025-07-24: EGX closed (observance not identified)
+  2025-09-04: EGX closed (observance not identified)
+  2025-10-09: EGX closed (observance not identified)
+  2026-01-01: New Year's Day
+  2026-01-07: Coptic Christmas
+  2026-01-29: EGX closed (observance not identified)
+  2026-03-22: EGX closed (observance not identified)
+  2026-03-23: EGX closed (observance not identified)
+  2026-04-12: EGX closed (observance not identified)
+  2026-04-13: EGX closed (observance not identified)
+  2026-05-07: EGX closed (observance not identified)
+  2026-05-31: EGX closed (observance not identified)
+  2026-07-02: EGX closed (observance not identified)
+  2026-07-23: July 23 Revolution
+
+# Sessions that run on non-default hours (Ramadan is the usual reason).
+# EGX announces Ramadan hours each year; enter them here when published rather
+# than hardcoding an assumption in code.
+#
+# Example shape:
+#   - start: 2026-02-18
+#     end: 2026-03-19
+#     reason: Ramadan
+#     pre_open_start: "09:30"
+#     continuous_start: "10:00"
+#     continuous_end: "13:00"
+#     closing_auction_end: "13:10"
+#     session_end: "13:15"
+special_sessions: []

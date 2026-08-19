@@ -1,0 +1,47 @@
+name: CI
+
+# Lint, type-check and test every push / PR.
+#
+# There is no deploy step, deliberately. egx-trader is not a web service: the
+# scanner runs from scheduled workflows here, and the execution arm runs on the
+# operator's Mac under launchd because it needs an authenticated ThndrX browser
+# session. Nothing about this system belongs on a hosted dyno.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      # The runner's system Python is externally managed, so uv needs a venv.
+      # `uv run` picks it up automatically for every step below.
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy
+
+      - name: Test
+        run: uv run pytest -q

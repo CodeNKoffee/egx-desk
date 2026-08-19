@@ -1,0 +1,65 @@
+name: Data audit
+
+# Runs the market-data quality gates across the whole universe and fails if
+# coverage degrades. This is a monitor, not a trader — it places no orders and
+# holds no broker credentials.
+#
+# Scheduled for 06:30 UTC = 08:30 Cairo, Sun-Thu: after the previous session has
+# settled into the feed, before the 09:30 pre-open. Cron day-of-week 0-4 is
+# Sun-Thu, matching EGX's trading week rather than a Mon-Fri assumption.
+#
+# Without the EGX_PROXY_KEY secret the job SKIPS rather than fails. A scheduled
+# job that goes red every weekday morning for a known-missing config just teaches
+# you to ignore CI. It only fails for a real regression in data coverage.
+on:
+  schedule:
+    - cron: "30 6 * * 0-4"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check whether the proxy key is configured
+        id: guard
+        env:
+          PROXY_KEY: ${{ secrets.EGX_PROXY_KEY }}
+        run: |
+          if [ -z "$PROXY_KEY" ]; then
+            echo "::warning title=Audit skipped::EGX_PROXY_KEY is not set, so the Yahoo Worker would reject every request. Add it under Settings -> Secrets -> Actions to enable this audit."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.guard.outputs.configured == 'true'
+
+      - name: Install uv
+        if: steps.guard.outputs.configured == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        if: steps.guard.outputs.configured == 'true'
+        run: uv python install 3.12
+
+      # The runner's system Python is externally managed, so uv needs a venv.
+      - name: Install dependencies
+        if: steps.guard.outputs.configured == 'true'
+        run: |
+          uv venv
+          uv pip install -e "."
+
+      - name: Audit universe data quality
+        if: steps.guard.outputs.configured == 'true'
+        env:
+          EGX_PROXY_KEY: ${{ secrets.EGX_PROXY_KEY }}
+        # Floor is 15%: the measured baseline on 2026-08-18 was 19% of the Sharia
+        # universe passing. This catches degradation, it does not assert health —
+        # 19% is itself the reason a second data source is needed.
+        run: uv run egx audit --fail-under 15

@@ -1,0 +1,44 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Data stores — never commit market data or trading state
+data/*.duckdb
+data/*.duckdb.wal
+data/*.sqlite
+data/*.sqlite-journal
+data/raw/
+data/intraday/
+data/exports/
+data/dashboard.html
+data/desk.html
+data/thndrx_session.json
+data/thndrx_profile/
+# Personal financial data — real holdings never enter the repo
+data/positions.yaml
+
+# Execution artifacts — order screenshots can contain account balances
+artifacts/
+logs/
+.playwright/
+storage_state.json
+
+# macOS
+.DS_Store

@@ -1,0 +1,17 @@
+# Example positions file. Copy to data/positions.yaml and put your real holdings
+# there — that path is gitignored, and real quantities and cost basis must never
+# be committed. The numbers below are deliberately fake.
+#
+#   cp positions.example.yaml data/positions.yaml
+#
+# Absent or empty means the system holds nothing, and the dashboard says so.
+positions:
+  - symbol: ADIB.CA
+    qty: 100
+    avg_cost: 50.00
+    opened: 2026-01-15
+    note: example row — replace with your own
+
+  - symbol: JUFO.CA
+    qty: 250
+    avg_cost: 20.00

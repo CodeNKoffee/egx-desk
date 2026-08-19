@@ -1,0 +1,678 @@
+# EGX instrument master.
+#
+# GENERATED SEED — hand-edit from here on; do not regenerate over local changes.
+#
+# `sharia` is a THREE-state field, not a boolean: compliant | non_compliant | unknown.
+# A boolean would force a guess for names we have no labelling for, and a wrong
+# "compliant" is the one error this system must never make. `unknown` is excluded
+# from the sharia universe, exactly like non_compliant.
+#
+# Fields left absent are genuinely unknown and must not be inferred:
+#   sector, board, lot_size, tick_size, price_limit_pct
+# `board` in particular gates T+0 eligibility (Most Active / Moderate / Tamayuz).
+# Absent board => not T+0 eligible, because unknown must never read as permissive.
+#
+# Provenance:
+#   compliant / non_compliant  -> curated from the May 2026 index base
+#   isin, name_ar              -> EGX Shariah Index May 2026.xlsx (34 of these rows)
+#   index_weight               -> EGX_BASE where published, else the xlsx weight x100
+#
+# Sharia labelling is AGGREGATED from Thndr's app. We do not certify compliance.
+
+instruments:
+- symbol: ACGC.CA
+  name_en: Arab Cotton Ginning
+  name_ar: العربية لحليج الأقطان
+  isin: EGS32221C011
+  index_weight: 0.35
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ADIB.CA
+  name_en: Abu Dhabi Islamic Bank – Egypt
+  name_ar: مصرف أبو ظبي الأسلامي- مصر
+  isin: EGS60111C019
+  index_weight: 7.32
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: AFMC.CA
+  name_en: Alexandria Flour Mills
+  index_weight: null
+  sharia: compliant
+  sharia_source: thndr_app
+  sharia_as_of: 2026-08-18
+  status: active
+  note: >-
+    Held. Sharia-compliant per Thndr's own labelling, confirmed by the account
+    holder. Not an EGX Shariah Index constituent, so it carries no index weight.
+- symbol: AJWA.CA
+  name_en: AJWA for Food Industries Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: AMOC.CA
+  name_en: Alexandria Mineral Oils Company
+  name_ar: الاسكندرية للزيوت المعدنية
+  isin: EGS380P1C010
+  index_weight: 2.34
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: AMPI.CA
+  name_en: Novida for Investment and Technology
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ARCC.CA
+  name_en: Arabian Cement Company
+  name_ar: العربية للاسمنت
+  isin: EGS3C0O1C016
+  index_weight: 0.99
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ARVA.CA
+  name_en: Arab Valves Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ATQA.CA
+  name_en: Misr National Steel – Ataqa
+  name_ar: مصر الوطنية للصلب - عتاقة
+  isin: EGS3D0C1C018
+  index_weight: 0.55
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: BIDI.CA
+  name_en: EL Badr Investment And Development BID
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: BIGP.CA
+  name_en: Barbary Investment Group
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: BIOC.CA
+  name_en: Glaxo Smith Kline
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: CAED.CA
+  name_en: Cairo Educational Services
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: CIRA.CA
+  name_en: Cairo For Investment & Real Estate (CIRA)
+  name_ar: القاهره للإستثمار و التنمية العقاريه سيرا للتعليم
+  isin: EGS65541C012
+  index_weight: 0.47
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: CLHO.CA
+  name_en: Cleopatra Hospital Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: CPCI.CA
+  name_en: Cairo Pharmaceuticals
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EALR.CA
+  name_en: El Arabia for Land Reclamation
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EDFM.CA
+  name_en: East Delta Flour Mills
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EFID.CA
+  name_en: Edita Food Industries
+  name_ar: ايديتا للصناعات الغذائية
+  isin: EGS305I1C011
+  index_weight: 5.64
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EFIH.CA
+  name_en: E-finance For Digital & Financial Inv.
+  name_ar: اي فاينانس للاستثمارات المالية والرقمية
+  isin: EGS743O1C013
+  index_weight: 11.89
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EGAL.CA
+  name_en: Egypt Aluminum
+  name_ar: مصر للالومنيوم
+  isin: EGS3E181C010
+  index_weight: 3.3
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EGAS.CA
+  name_en: Natural Gas & Mining Project (Egypt Gas)
+  name_ar: غاز مصر
+  isin: EGS39011C019
+  index_weight: 0.39
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EHDR.CA
+  name_en: Egyptians Housing Development & Reconstruction
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: EMDE.CA
+  name_en: Emerald Development and Projects Management
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: paused
+  note: EMDE/EMRI merged into EHDR.CA
+- symbol: EMRI.CA
+  name_en: Emerald Real Estate Investment
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: paused
+  note: EMDE/EMRI merged into EHDR.CA
+- symbol: ETEL.CA
+  name_en: Telecom Egypt
+  name_ar: المصرية للاتصالات
+  isin: EGS48031C016
+  index_weight: 15.0
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ETRS.CA
+  name_en: Egyptian Transport (EGYTRANS)
+  name_ar: المصرية لخدمات النقل (ايجيترانس)
+  isin: EGS42051C010
+  index_weight: 0.3
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: FAIT.CA
+  name_en: Faisal Islamic Bank of Egypt (EGP)
+  name_ar: بنك فيصل الاسلامي المصرية بالجنية
+  isin: EGS60321C014
+  index_weight: 0.89
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: FAITA.CA
+  name_en: Faisal Islamic Bank of Egypt (USD)
+  name_ar: بنك فيصل الاسلامي المصري - بالدولار
+  isin: EGS60322C012
+  index_weight: 2.56
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: FCMD.CA
+  name_en: Future Care For Medical Industries
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: FNAR.CA
+  name_en: Al Fanar Contracting Construction Trade Import & Export Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: GETO.CA
+  name_en: Genial Tours
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: paused
+- symbol: GIHD.CA
+  name_en: Gharbia Islamic Housing Development
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: GMCI.CA
+  name_en: GMC Group for Industrial, Commercial & Financial Investments
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: GPIM.CA
+  name_en: GPI For Urban Growth
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: GTHE.CA
+  name_en: Global Telecom Holding
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: GTWL.CA
+  name_en: Gadwa for Industrial Development
+  index_weight: null
+  sharia: non_compliant
+  sharia_source: thndr_app
+  sharia_as_of: 2026-08-18
+  status: active
+  note: >-
+    Held, but NOT Sharia-compliant per Thndr's labelling, confirmed by the account
+    holder. Excluded from sharia mode; still tracked because it is a live position
+    and whole-book management needs metadata for everything actually owned.
+- symbol: ICFC.CA
+  name_en: Int'l Company For Fertilizers & Chemicals
+  name_ar: الدولية للأسمدة والكيماويات
+  isin: EGS520D1C015
+  index_weight: 0.19
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: IDHC.CA
+  name_en: Integrated Diagnostics Holdings
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: delisted
+  note: voluntarily delisted from EGX; still trades on LSE
+- symbol: IDRE.CA
+  name_en: Ismailia Development & Real Estate Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: IEEC.CA
+  name_en: Industrial and Engineering Enterprises
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: IFAP.CA
+  name_en: International Agricultural Products
+  name_ar: الدوليه للمحاصيل الزراعيه
+  isin: EGS07061C012
+  index_weight: 0.75
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: INEG.CA
+  name_en: Integrated Engineering Group S.A.E
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: INFI.CA
+  name_en: Ismailia National Food Industries (Foodico)
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ISMA.CA
+  name_en: Ismailia Misr Poultry
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ISMQ.CA
+  name_en: Iron and Steel for Mines and Quarries
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ISPH.CA
+  name_en: Ibnsina Pharma
+  name_ar: ابن سينا فارما
+  isin: EGS512O1C012
+  index_weight: 2.51
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: JUFO.CA
+  name_en: Juhayna Food Industries
+  name_ar: جهينة للصناعات الغذائية
+  isin: EGS30901C010
+  index_weight: 2.44
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: KABO.CA
+  name_en: El Nasr Clothes & Textiles
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: LCSW.CA
+  name_en: Lecico Egypt
+  name_ar: ليسيكو مصر
+  isin: EGS3C161C014
+  index_weight: 0.21
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MASR.CA
+  name_en: Madinet Masr For Housing & Development
+  name_ar: مدينة مصر للاسكان والتعمير
+  isin: EGS65571C019
+  index_weight: 2.12
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MCQE.CA
+  name_en: Misr Cement (Qena)
+  name_ar: مصر للاسمنت - قنا
+  isin: EGS3C391C017
+  index_weight: 2.65
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MCRO.CA
+  name_en: Macro Group
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MFPC.CA
+  name_en: Misr Fertilizers Production
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MICH.CA
+  name_en: Misr Chemical Industries
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MILS.CA
+  name_en: North Cairo Mills
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MISR.CA
+  name_en: Misr Intercontinental for Granite & Marble (EGYSTONE)
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MKIT.CA
+  name_en: Misr Kuwait Investment and Trading
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MMAT.CA
+  name_en: Marsa Alam for Tourism Development
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MOED.CA
+  name_en: Egyptian Modern Education Systems
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MOSC.CA
+  name_en: Misr Oils & Soap
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MPCO.CA
+  name_en: Mansourah Poultry
+  name_ar: المنصورة للدواجن
+  isin: EGS02091C014
+  index_weight: 0.38
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: MTIE.CA
+  name_en: MM Group For Industry & Int'l Trade
+  name_ar: ام.ام جروب للصناعة والتجارة العالمية
+  isin: EGS75011C014
+  index_weight: 0.66
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: NCCW.CA
+  name_en: Nasr Company for Civil Works
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: NCGC.CA
+  name_en: Nile Cotton Ginning
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: NDRL.CA
+  name_en: National Drilling Company
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: paused
+- symbol: NEDA.CA
+  name_en: Northern Upper Egypt Development & Agricultural Production
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: NINH.CA
+  name_en: Nozha International Hospital
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: OBRI.CA
+  name_en: El Obour Real Estate Investment
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: OCDI.CA
+  name_en: SODIC (Six of October Dev. & Investment)
+  name_ar: السادس من اكتوبر للتنميه والاستثمار- سوديك
+  isin: EGS65851C015
+  index_weight: 1.33
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: OLFI.CA
+  name_en: Obour Land For Food Industries
+  name_ar: عبور لاند للصناعات الغذائية
+  isin: EGS30AL1C012
+  index_weight: 1.12
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ORAS.CA
+  name_en: Orascom Construction PLC
+  name_ar: اوراسكوم كونستراكشون بي ال سي
+  isin: EGS95001C011
+  index_weight: 4.87
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ORHD.CA
+  name_en: Orascom Development Egypt
+  name_ar: اوراسكوم للتنمية مصر
+  isin: EGS70321C012
+  index_weight: 2.85
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ORWE.CA
+  name_en: Oriental Weavers
+  name_ar: النساجون الشرقيون للسجاد
+  isin: EGS33041C012
+  index_weight: 1.71
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: PACH.CA
+  name_en: Paint & Chemicals Industries (PACHIN)
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: PHDC.CA
+  name_en: Palm Hills Development
+  name_ar: بالم هيلز للتعمير
+  isin: EGS655L1C012
+  index_weight: 3.7
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: POUL.CA
+  name_en: Cairo Poultry
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: PRCL.CA
+  name_en: Ceramic & Porcelain
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: RACC.CA
+  name_en: Raya Customer Experience
+  name_ar: راية لخدمات مراكز الاتصالات
+  isin: EGS74191C015
+  index_weight: 0.19
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: RMDA.CA
+  name_en: Rameda Pharmaceutical Industries
+  name_ar: العاشر من رمضان للصناعات الدوائية والمستحضرات تشخيصية-راميدا
+  isin: EGS381B1C015
+  index_weight: 1.6
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: RUBX.CA
+  name_en: Rubex International for Plastic & Acrylic Manufacturing
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SAUD.CA
+  name_en: Al Baraka Bank Egypt
+  name_ar: بنك البركة مصر
+  isin: EGS60101C010
+  index_weight: 0.56
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SCEM.CA
+  name_en: Sinai Cement
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SCFM.CA
+  name_en: South Cairo & Giza Mills & Bakeries
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SKPC.CA
+  name_en: Sidi Kerir Petrochemicals (SIDPEC)
+  name_ar: سيدى كرير للبتروكيماويات - سيدبك
+  isin: EGS380S1C017
+  index_weight: 3.19
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SMFR.CA
+  name_en: Samad Misr (EGYFERT)
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SPIN.CA
+  name_en: Alexandria Spinning & Weaving (SPINALEX)
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SPMD.CA
+  name_en: Speed Medical
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: SUGR.CA
+  name_en: Delta Sugar
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: TANM.CA
+  name_en: Tanmiya for Real Estate Investment
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: TMGH.CA
+  name_en: T M G Holding
+  name_ar: مجموعة طلعت مصطفى القابضة
+  isin: EGS691S1C011
+  index_weight: 15.0
+  sharia: non_compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: UEFM.CA
+  name_en: Upper Egypt Flour Mills
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: UPMS.CA
+  name_en: Union Pharmacist Company for Medical Services & Investment
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: VERT.CA
+  name_en: Vertika for Industry & Trade
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: WKOL.CA
+  name_en: Wadi Kom Ombo Land Reclamation
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active
+- symbol: ZEOT.CA
+  name_en: Extracted Oils
+  index_weight: null
+  sharia: compliant
+  sharia_source: index_base_2026_05
+  status: active

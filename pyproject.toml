@@ -1,0 +1,81 @@
+[project]
+name = "egx-trader"
+version = "0.1.0"
+description = "Momentum/breakout trading system for the Egyptian Exchange, executing via ThndrX"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+dependencies = [
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "httpx>=0.27",
+    "tenacity>=9.0",
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "duckdb>=1.1",
+    # duckdb needs pytz to hand TIMESTAMPTZ columns back to Python. Everything
+    # else here uses stdlib zoneinfo; this is duckdb's requirement, not a choice.
+    "pytz>=2024.1",
+    "pyyaml>=6.0",
+    "typer>=0.15",
+    "rich>=13.9",
+    "structlog>=24.4",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.48"]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "pytest-asyncio>=0.24",
+    "respx>=0.21",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "types-PyYAML>=6.0",
+    "freezegun>=1.5",
+]
+
+[project.scripts]
+egx = "egx_trader.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/egx_trader"]
+artifacts = ["*.html", "*.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF", "PL", "DTZ"]
+ignore = [
+    "PLR0913", # many args is fine for config-ish constructors
+    "PLR2004", # magic numbers are readable in market-rule code
+]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+disallow_untyped_defs = true
+mypy_path = "src"
+packages = ["egx_trader"]
+
+[[tool.mypy.overrides]]
+module = ["duckdb.*", "pandas.*", "playwright.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q --strict-markers"
+markers = [
+    "network: hits a live upstream; skipped by default (run with -m network)",
+]

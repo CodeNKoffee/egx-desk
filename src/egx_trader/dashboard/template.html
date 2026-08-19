@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EGX Trader — Desk</title>
+<!-- Inline SVG favicon: a rising bar chart in the accent green. No external
+     request, so it survives being opened straight off disk. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1220'/%3E%3Crect x='6' y='19' width='4.5' height='8' rx='1.2' fill='%232de1a4'/%3E%3Crect x='13.7' y='13' width='4.5' height='14' rx='1.2' fill='%232de1a4'/%3E%3Crect x='21.4' y='6' width='4.5' height='21' rx='1.2' fill='%232de1a4'/%3E%3C/svg%3E"/>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b1220; --panel:#0e1626; --panel-2:#111c30;
+  --line:#1b2a44; --line-2:#233a5c; --line-soft:#16233a;
+  --ink:#e6edf7; --ink-2:#93a4c0; --ink-3:#5f7396;
+  --accent:#2de1a4; --accent-dim:#0f3d2e; --info:#4aa8ff; --warn:#ffb454; --bad:#ff5c6c;
+  --grid:14px; --radius:10px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:
+    radial-gradient(1200px 600px at 78% -8%, #10233d 0%, transparent 60%),
+    radial-gradient(900px 500px at 8% 110%, #0d1c33 0%, transparent 55%),
+    var(--bg);
+  color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+/* ── top bar ─────────────────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:16px;
+  padding:10px 18px;background:rgba(7,11,20,.86);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+}
+.brand{display:flex;align-items:center;gap:9px;font-weight:650;letter-spacing:.02em}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 3px rgba(45,225,164,.16),0 0 14px rgba(45,225,164,.55)}
+.dot.closed{background:var(--ink-3);box-shadow:none}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel);font-size:11px;color:var(--ink-2);
+  font-family:var(--mono);white-space:nowrap;
+}
+.pill b{color:var(--ink);font-weight:600}
+.pill.ok{border-color:rgba(45,225,164,.35);color:var(--accent)}
+.pill.warn{border-color:rgba(255,180,84,.35);color:var(--warn)}
+.pill.bad{border-color:rgba(255,92,108,.4);color:var(--bad)}
+.spacer{flex:1}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+button.ui{
+  font:inherit;font-size:11px;padding:5px 11px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+  transition:.15s;font-family:var(--mono);
+}
+button.ui:hover{border-color:var(--accent);color:var(--accent);background:var(--panel-2)}
+button.ui.on{border-color:var(--accent);color:#04120c;background:var(--accent);font-weight:650}
+/* ── switch ──────────────────────────────────────────────── */
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.track{
+  width:38px;height:21px;border-radius:999px;background:var(--panel-2);
+  border:1px solid var(--line);position:relative;transition:.18s;flex:none;
+}
+.track i{
+  position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;
+  background:var(--ink-3);transition:.18s;
+}
+.switch.on .track{background:rgba(45,225,164,.2);border-color:var(--accent)}
+.switch.on .track i{left:20px;background:var(--accent);box-shadow:0 0 10px rgba(45,225,164,.7)}
+.switch span{font-size:11px;font-family:var(--mono);color:var(--ink-2)}
+/* ── layout ──────────────────────────────────────────────── */
+#desk{position:relative;padding:14px;min-height:calc(100vh - 46px)}
+.panel{
+  position:absolute;display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--bg-2) 100%);
+  border:1px solid var(--line-soft);border-radius:var(--radius);
+  box-shadow:0 10px 34px rgba(0,0,0,.45);transition:border-color .15s,box-shadow .15s;
+}
+.panel:hover{border-color:var(--line)}
+.panel.drag{z-index:40;border-color:var(--accent);box-shadow:0 22px 60px rgba(0,0,0,.65)}
+.panel h2{
+  margin:0;padding:9px 12px;font-size:11px;font-weight:650;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid var(--line-soft);
+  cursor:grab;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.015);
+  flex:none;
+}
+.panel h2:active{cursor:grabbing}
+.panel h2 .tag{margin-left:auto;font-size:10px;color:var(--ink-3);font-family:var(--mono);
+  text-transform:none;letter-spacing:0}
+.body{padding:11px 12px;overflow:auto;flex:1;min-height:0}
+.grip{position:absolute;right:0;bottom:0;width:15px;height:15px;cursor:nwse-resize}
+.grip::after{content:"";position:absolute;right:3px;bottom:3px;width:7px;height:7px;
+  border-right:2px solid var(--line);border-bottom:2px solid var(--line)}
+.panel:hover .grip::after{border-color:var(--accent)}
+/* ── content ─────────────────────────────────────────────── */
+.kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;
+  border-bottom:1px solid rgba(27,42,68,.4)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--ink-2);font-size:11.5px}
+.kv .v{font-family:var(--mono);font-size:12px;color:var(--ink);text-align:right}
+.big{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.01em}
+.sub{color:var(--ink-3);font-size:11px;font-family:var(--mono)}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{text-align:left;font-weight:600;color:var(--ink-3);font-size:10px;
+  text-transform:uppercase;letter-spacing:.07em;padding:0 6px 6px 0;
+  position:sticky;top:0;background:var(--panel)}
+td{padding:4px 6px 4px 0;border-top:1px solid rgba(27,42,68,.35);font-family:var(--mono)}
+td.name{font-family:var(--sans);color:var(--ink-2)}
+.num{text-align:right}
+.ok{color:var(--accent)} .warn{color:var(--warn)} .bad{color:var(--bad)} .info{color:var(--info)}
+.muted{color:var(--ink-3)}
+.bar{height:5px;border-radius:3px;background:var(--panel-2);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--info))}
+.notice{display:flex;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:7px;
+  border:1px solid var(--line);background:var(--panel-2);font-size:11.5px;line-height:1.5}
+.notice.warn{border-color:rgba(255,180,84,.3)}
+.notice.ok{border-color:rgba(45,225,164,.28)}
+.notice .ico{flex:none;font-family:var(--mono);font-weight:700}
+.phase{display:flex;align-items:center;gap:9px;padding:5px 0}
+.phase .n{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:700;flex:none;
+  background:var(--panel-2);color:var(--ink-3);border:1px solid var(--line)}
+.phase.done .n{background:var(--accent);color:#04120c;border-color:var(--accent)}
+.phase.blocked .n{border-color:var(--warn);color:var(--warn)}
+.phase .t{font-size:11.5px}
+.phase .d{color:var(--ink-3);font-size:10.5px}
+/* ── scrollbars ──────────────────────────────────────────── */
+/* The OS scrollbar is a light slab on a dark panel. Style track and thumb both,
+   or the track stays bright and the panel looks unfinished. */
+*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.02);border-radius:6px}
+::-webkit-scrollbar-thumb{
+  background:var(--line);border-radius:6px;
+  border:2px solid transparent;background-clip:content-box;
+}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3);background-clip:content-box}
+::-webkit-scrollbar-corner{background:transparent}
+.body::-webkit-scrollbar-track{background:transparent}
+
+/* ── tooltip ─────────────────────────────────────────────── */
+/* Tooltips render into a single element at body level rather than as a child
+   pseudo-element. Panels scroll (`overflow:auto`), and an ::after inside a
+   scrolling box is clipped by it — there is no CSS escape from that, so the
+   tooltip is positioned by JS instead. */
+#tip{
+  position:fixed;z-index:9999;max-width:300px;padding:8px 10px;border-radius:8px;
+  background:#050912;color:var(--ink);border:1px solid var(--line);
+  font-family:var(--sans);font-size:11px;line-height:1.5;font-weight:400;
+  text-transform:none;letter-spacing:0;pointer-events:none;
+  box-shadow:0 12px 34px rgba(0,0,0,.75);opacity:0;transition:opacity .1s;
+}
+#tip.on{opacity:1}
+.help{display:inline-grid;place-items:center;width:13px;height:13px;border-radius:50%;
+  border:1px solid var(--line);color:var(--ink-3);font-size:9px;cursor:help;
+  font-family:var(--mono);vertical-align:middle;margin-left:4px}
+.help:hover{border-color:var(--accent);color:var(--accent)}
+footer{padding:12px 18px;color:var(--ink-3);font-size:10.5px;font-family:var(--mono);
+  border-top:1px solid var(--line-soft);display:flex;gap:14px;flex-wrap:wrap}
+@media(max-width:900px){
+  .panel{position:relative!important;left:auto!important;top:auto!important;
+    width:auto!important;height:auto!important;max-height:420px;margin-bottom:12px}
+  #desk{display:block}
+  .grip{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="dot" id="live-dot"></span> EGX&nbsp;TRADER</div>
+  <span class="pill" id="p-session" data-tip="EGX runs Sun–Thu. Pre-open 09:30, continuous 10:00–14:15, closing auction 14:15–14:25, trading-at-close until 14:30. All Africa/Cairo."></span>
+  <span class="pill" id="p-mode"></span>
+  <span class="pill" id="p-universe"></span>
+  <div class="spacer"></div>
+  <div class="controls">
+    <label class="switch" id="sw-lock" data-tip="Lock the layout so panels cannot be dragged or resized by accident."><span class="track"><i></i></span><span>Lock</span></label>
+    <button class="ui" data-layout="desk" data-tip="Dense multi-panel layout, like a trading desk.">Desk</button>
+    <button class="ui" data-layout="focus" data-tip="Fewer, larger panels — data health and universe front and centre.">Focus</button>
+    <button class="ui" data-layout="stack" data-tip="Single column. Good for a narrow window or a second monitor.">Stack</button>
+    <button class="ui" id="btn-reset" data-tip="Discard your saved arrangement and restore this layout's defaults.">Reset</button>
+  </div>
+</header>
+<div id="desk"></div>
+<div id="tip" role="tooltip" aria-hidden="true"></div>
+<footer>
+  <span>snapshot <b id="f-gen"></b></span>
+  <span id="f-mode" data-tip="">—</span>
+  <span id="f-warn" class="warn"></span>
+</footer>
+<script>
+const DATA = __SNAPSHOT__;
+const DESK_TOKEN = "__DESK_TOKEN__";
+/* Live only when served by `egx desk`, which substitutes the token. Opened from
+   disk the placeholder survives, and the page stays a read-only snapshot. */
+const LIVE = !DESK_TOKEN.startsWith("__DESK");
+const $ = (s,r=document)=>r.querySelector(s);
+const el = (t,c,h)=>{const n=document.createElement(t);if(c)n.className=c;if(h!=null)n.innerHTML=h;return n;};
+const pct = v => (v*100).toFixed(0)+'%';
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ── panel definitions ─────────────────────────────────── */
+const PANELS = {
+  session:{title:'Session', tip:'Live EGX session phase from the market calendar. Derived, not guessed — see the calendar panel.', render:sessionPanel},
+  notices:{title:'What you need to know', tip:'Things that would change a decision. Not decoration.', render:noticesPanel},
+  health:{title:'Data health', tip:'How much of the market the configured feed actually covers. This is the blocker on everything downstream.', render:healthPanel},
+  providers:{title:'Data providers', tip:'Order is priority: first provider with a bar for a date wins, later ones fill gaps. Set with EGX_DATA_PROVIDERS.', render:providersPanel},
+  universe:{title:'Universe', tip:'The tradable set. Sharia mode admits only positively-labelled names — unknown is excluded, same as non-compliant.', render:universePanel},
+  calendar:{title:'Calendar', tip:'Derived from the exchange trading record, not from Egypt’s public holidays. EGX traded on Police Day 2026 but was closed on it in 2024.', render:calendarPanel},
+  holdings:{title:'Holdings', tip:'Read from ThndrX. Static until the portfolio ledger lands in Phase 2 — these are not live prices.', render:holdingsPanel},
+  safety:{title:'Safety interlocks', tip:'Checked at boot, not at order time. A misconfigured process refuses to start.', render:safetyPanel},
+  control:{title:'Control', tip:'Runs from the desk itself. Deliberately has no order path — placing trades stays behind the execution-mode gates and per-order confirmation, where a mis-click cannot reach it.', render:controlPanel},
+  phases:{title:'Build phases', tip:'What exists and what does not. Stated explicitly so the UI cannot imply a capability it lacks.', render:phasesPanel},
+};
+
+/* ── layouts: [x, y, w, h] on a 12-col grid, row unit 34px ─ */
+const LAYOUTS = {
+  desk:{
+    session:[0,0,3,5],  health:[0,5,3,6],   calendar:[0,11,3,8],
+    notices:[3,0,6,5],  universe:[3,5,6,9], phases:[3,14,6,5],
+    safety:[9,0,3,8],   providers:[9,8,3,5], holdings:[9,13,3,6],
+    control:[0,19,12,7],
+  },
+  focus:{
+    health:[0,0,4,7],   notices:[4,0,8,7],
+    universe:[0,7,7,11], providers:[7,7,5,6],
+    calendar:[7,13,5,5], session:[0,18,4,5], holdings:[4,18,4,5], safety:[8,18,4,8],
+    phases:[0,23,8,5], control:[0,28,12,7],
+  },
+  stack:{
+    session:[0,0,12,5],  notices:[0,5,12,5],   health:[0,10,12,6],
+    providers:[0,16,12,5], universe:[0,21,12,9], calendar:[0,30,12,8],
+    holdings:[0,38,12,6], safety:[0,44,12,8],  phases:[0,52,12,5],
+    control:[0,57,12,7],
+  },
+};
+const ROW = 38, GAP = 12;
+
+/* localStorage throws outright in some contexts — data: URLs, sandboxed iframes,
+   Safari private browsing. Layout persistence is a convenience; losing it must
+   never take the whole page down with it. */
+const store = (() => {
+  try {
+    const k = '__egx_probe__';
+    localStorage.setItem(k, '1'); localStorage.removeItem(k);
+    return localStorage;
+  } catch { return null; }
+})();
+const readStore = (k, fallback) => { try { return store?.getItem(k) ?? fallback; } catch { return fallback; } };
+const writeStore = (k, v) => { try { store?.setItem(k, v); } catch { /* not persistable here */ } };
+
+let layoutName = readStore('egx.layout', 'desk');
+let custom = (() => { try { return JSON.parse(readStore('egx.custom', '{}')); } catch { return {}; } })();
+let locked = readStore('egx.locked', '0') === '1';
+if(!LAYOUTS[layoutName]) layoutName = 'desk';
+
+function colW(){ const w = $('#desk').clientWidth - GAP; return (w - GAP*11)/12; }
+
+function place(node, box){
+  const cw = colW();
+  node.style.left   = (GAP/2 + box[0]*(cw+GAP)) + 'px';
+  node.style.top    = (GAP/2 + box[1]*ROW) + 'px';
+  node.style.width  = (box[2]*cw + (box[2]-1)*GAP) + 'px';
+  node.style.height = (box[3]*ROW - GAP) + 'px';
+}
+
+function currentBoxes(){
+  const base = LAYOUTS[layoutName];
+  const over = custom[layoutName] || {};
+  const out = {};
+  for(const k of Object.keys(base)) out[k] = over[k] || base[k];
+  return out;
+}
+
+function render(){
+  const desk = $('#desk'); desk.innerHTML='';
+  const boxes = currentBoxes();
+  let maxY = 0;
+  for(const [key, box] of Object.entries(boxes)){
+    const def = PANELS[key]; if(!def) continue;
+    const p = el('section','panel'); p.dataset.key = key;
+    const h = el('h2', null, `<span data-tip="${esc(def.tip)}">${esc(def.title)}<span class="help">?</span></span>`);
+    p.appendChild(h);
+    const b = el('div','body'); def.render(b); p.appendChild(b);
+    const g = el('div','grip'); p.appendChild(g);
+    place(p, box); desk.appendChild(p);
+    maxY = Math.max(maxY, box[1]+box[3]);
+    if(!locked){ drag(p,h,key); resize(p,g,key); }
+  }
+  desk.style.height = (maxY*ROW + GAP) + 'px';
+  document.querySelectorAll('[data-layout]').forEach(b=>b.classList.toggle('on', b.dataset.layout===layoutName));
+  $('#sw-lock').classList.toggle('on', locked);
+}
+
+/* ── collision resolution ──────────────────────────────────
+   Dropping a panel onto an occupied cell used to overlap it. Now the panels
+   settle: anything the moved panel lands on is pushed down, and anything THAT
+   lands on is pushed in turn, so a chain resolves rather than a single swap.
+   A swap alone breaks as soon as the two panels are different sizes — a tall
+   panel dropped on a short one leaves a hole and an overlap. Pushing handles
+   both because it only ever moves things out of the way.
+   Then everything floats back up into whatever space that opened. */
+
+function overlaps(a, b){
+  return a[0] < b[0] + b[2] && b[0] < a[0] + a[2] &&
+         a[1] < b[1] + b[3] && b[1] < a[1] + a[3];
+}
+
+function resolveCollisions(boxes, movedKey){
+  const layout = {...boxes};
+  // Settle in reading order so a push cascades predictably rather than
+  // depending on object key order.
+  const order = () => Object.keys(layout).sort((a,b) =>
+    layout[a][1] - layout[b][1] || layout[a][0] - layout[b][0]);
+
+  for(let pass = 0; pass < 40; pass++){
+    let moved = false;
+    for(const key of order()){
+      if(key === movedKey) continue;
+      if(!overlaps(layout[key], layout[movedKey])) continue;
+      // Push straight down, just far enough to clear.
+      layout[key] = [layout[key][0],
+                     layout[movedKey][1] + layout[movedKey][3],
+                     layout[key][2], layout[key][3]];
+      moved = true;
+    }
+    // Now settle every remaining pair the same way.
+    for(const a of order()){
+      for(const b of order()){
+        if(a === b || a === movedKey) continue;
+        if(!overlaps(layout[a], layout[b])) continue;
+        const lower = layout[a][1] >= layout[b][1] ? a : b;
+        const upper = lower === a ? b : a;
+        if(lower === movedKey) continue;
+        layout[lower] = [layout[lower][0],
+                         layout[upper][1] + layout[upper][3],
+                         layout[lower][2], layout[lower][3]];
+        moved = true;
+      }
+    }
+    if(!moved) break;
+  }
+  return compact(layout, movedKey);
+}
+
+function compact(boxes, pinned){
+  /* Float panels up into any gap a push opened, so the grid stays dense.
+     Without this the layout only ever grows downwards. */
+  const layout = {...boxes};
+  const keys = Object.keys(layout).sort((a,b) =>
+    layout[a][1] - layout[b][1] || layout[a][0] - layout[b][0]);
+  for(const key of keys){
+    let box = layout[key];
+    while(box[1] > 0){
+      const lifted = [box[0], box[1] - 1, box[2], box[3]];
+      const hits = keys.some(other => other !== key && overlaps(lifted, layout[other]));
+      if(hits) break;
+      box = lifted;
+      layout[key] = box;
+    }
+  }
+  return layout;
+}
+
+function saveBox(key, box){
+  const resolved = resolveCollisions({...currentBoxes(), [key]: box}, key);
+  custom[layoutName] = resolved;
+  writeStore('egx.custom', JSON.stringify(custom));
+}
+
+function preview(key, box, dragging){
+  const resolved = resolveCollisions({...currentBoxes(), [key]: box}, key);
+  for(const node of document.querySelectorAll('.panel')){
+    if(node === dragging) continue;
+    const target = resolved[node.dataset.key];
+    if(target) place(node, target);
+  }
+}
+
+function drag(panel, handle, key){
+  handle.onmousedown = e => {
+    if(e.target.closest('.help')) return;
+    e.preventDefault();
+    const cw = colW(), box = currentBoxes()[key].slice();
+    const sx = e.clientX, sy = e.clientY;
+    panel.classList.add('drag');
+    const move = ev => {
+      const dx = Math.round((ev.clientX-sx)/(cw+GAP));
+      const dy = Math.round((ev.clientY-sy)/ROW);
+      const b = [Math.max(0,Math.min(12-box[2],box[0]+dx)), Math.max(0,box[1]+dy), box[2], box[3]];
+      place(panel,b); panel._box = b;
+      // Show the other panels getting out of the way live, rather than
+      // rearranging only once the drag ends.
+      preview(key, b, panel);
+    };
+    const up = () => {
+      document.removeEventListener('mousemove',move); document.removeEventListener('mouseup',up);
+      panel.classList.remove('drag');
+      if(panel._box){ saveBox(key,panel._box); render(); }
+    };
+    document.addEventListener('mousemove',move); document.addEventListener('mouseup',up);
+  };
+}
+
+function resize(panel, grip, key){
+  grip.onmousedown = e => {
+    e.preventDefault(); e.stopPropagation();
+    const cw = colW(), box = currentBoxes()[key].slice();
+    const sx = e.clientX, sy = e.clientY;
+    panel.classList.add('drag');
+    const move = ev => {
+      const dw = Math.round((ev.clientX-sx)/(cw+GAP));
+      const dh = Math.round((ev.clientY-sy)/ROW);
+      const b = [box[0],box[1],Math.max(2,Math.min(12-box[0],box[2]+dw)),Math.max(3,box[3]+dh)];
+      place(panel,b); panel._box = b;
+    };
+    const up = () => {
+      document.removeEventListener('mousemove',move); document.removeEventListener('mouseup',up);
+      panel.classList.remove('drag');
+      if(panel._box){ saveBox(key,panel._box); render(); }
+    };
+    document.addEventListener('mousemove',move); document.addEventListener('mouseup',up);
+  };
+}
+
+/* ── renderers ─────────────────────────────────────────── */
+function kv(parent,k,v,cls,tip){
+  const r = el('div','kv');
+  r.appendChild(el('span','k', tip?`<span data-tip="${esc(tip)}">${esc(k)}<span class="help">?</span></span>`:esc(k)));
+  r.appendChild(el('span','v'+(cls?' '+cls:''), v));
+  parent.appendChild(r); return r;
+}
+
+function sessionPanel(b){
+  const s = DATA.session;
+  b.appendChild(el('div','big'+(s.accepts_orders?' ok':' muted'), s.phase.replace(/_/g,' ')));
+  b.appendChild(el('div','sub', s.now_cairo + ' Cairo'));
+  b.appendChild(el('div',null,'<div style="height:8px"></div>'));
+  kv(b,'Accepts orders', s.accepts_orders?'yes':'no', s.accepts_orders?'ok':'muted',
+     'Orders can be submitted from pre-open through trading-at-close.');
+  kv(b,'Trading day', s.is_trading_day?'yes':'no', s.is_trading_day?'ok':'muted');
+  kv(b,'Next session', s.next_session);
+  if(s.in_random_close) kv(b,'Discovery close','imminent','warn',
+    'Between 09:50 and 10:00 the pre-open closes at a random moment chosen by the exchange. Order rejections here are expected, not a bug.');
+}
+
+function noticesPanel(b){
+  DATA.notices.forEach(n=>{
+    const d = el('div','notice '+n.level);
+    d.appendChild(el('span','ico '+(n.level==='ok'?'ok':'warn'), n.level==='ok'?'✓':'!'));
+    d.appendChild(el('span',null, esc(n.text)));
+    b.appendChild(d);
+  });
+}
+
+function healthPanel(b){
+  const pass = 0.19;
+  b.appendChild(el('div','big warn', pct(pass)));
+  b.appendChild(el('div','sub','of the Sharia universe passes'));
+  const bar = el('div','bar'); bar.appendChild(el('i')); bar.firstChild.style.width = pct(pass);
+  b.appendChild(bar);
+  b.appendChild(el('div',null,'<div style="height:10px"></div>'));
+  kv(b,'Missing sessions','22–30%','bad','Spread evenly across Sun–Thu, so it is not calendar misalignment — the feed simply lacks those days.');
+  kv(b,'Absent upstream','8 of 72','warn','Symbols Yahoo has no chart for at all.');
+  kv(b,'Feed lag','2 sessions','warn','Yahoo trails the broker. Fine for backtesting, not for live pricing.');
+  kv(b,'Blocked names','50','bad');
+  b.appendChild(el('div','sub','<br>Run <b>egx audit</b> to reproduce.'));
+}
+
+function providersPanel(b){
+  const t = el('table');
+  t.innerHTML = '<tr><th>Provider</th><th>Cost</th><th>Auto</th><th class="num">State</th></tr>';
+  DATA.providers.forEach(p=>{
+    const tr = el('tr');
+    tr.innerHTML =
+      `<td data-tip="${esc(p.note)}">${p.active?'<span class="ok">▸</span> ':'<span class="muted">·</span> '}${esc(p.name)}</td>`+
+      `<td class="muted">${esc(p.cost)}</td>`+
+      `<td class="${p.automatable==='yes'?'ok':'warn'}">${esc(p.automatable)}</td>`+
+      `<td class="num ${p.configured?'ok':'muted'}">${p.configured?'ready':'not set'}</td>`;
+    t.appendChild(tr);
+  });
+  b.appendChild(t);
+  b.appendChild(el('div','sub','<br>Priority order. First with a bar for a date wins; later ones fill gaps.'));
+}
+
+function universePanel(b){
+  const u = DATA.universe;
+  const head = el('div');
+  kv(head,'Mode', esc(u.mode), 'ok', 'EGX_UNIVERSE_MODE. Sharia admits only positively-labelled names.');
+  kv(head,'Sharia / All', `${u.sharia_count} / ${u.all_count}`);
+  kv(head,'T+0 eligible', String(u.t0_eligible), u.t0_eligible?'ok':'muted',
+     'Requires a known board (Most Active / Moderate / Tamayuz). Board data is not sourced yet, so nothing claims T+0 — unknown never reads as permissive.');
+  b.appendChild(head);
+  const t = el('table');
+  t.innerHTML='<tr><th>Symbol</th><th>Name</th><th class="num">Weight</th></tr>';
+  u.instruments.slice(0,200).forEach(i=>{
+    const tr = el('tr');
+    tr.innerHTML = `<td class="${i.sharia==='compliant'?'ok':(i.sharia==='unknown'?'warn':'bad')}">${esc(i.symbol)}</td>`+
+      `<td class="name">${esc(i.name.slice(0,34))}</td>`+
+      `<td class="num muted">${i.weight!=null?i.weight.toFixed(2):'—'}</td>`;
+    t.appendChild(tr);
+  });
+  b.appendChild(t);
+}
+
+function calendarPanel(b){
+  const c = DATA.calendar;
+  kv(b,'Verified through', c.verified_through, c.coverage_ok?'ok':'warn',
+     'Past this date, strict lookups raise rather than guess. A missing holiday corrupts settlement dates.');
+  kv(b,'Non-trading days', String(c.holiday_count), 'info',
+     'Derived from the trading record: closed when under 15% of a 16-name liquid basket has a bar.');
+  const t = el('table');
+  t.innerHTML='<tr><th>Date</th><th>Day</th><th>Note</th><th class="num">T+2</th></tr>';
+  c.upcoming.forEach(d=>{
+    const tr = el('tr');
+    tr.innerHTML = `<td class="${d.trading?'':'muted'}">${d.date.slice(5)}</td>`+
+      `<td class="${d.trading?'ok':'muted'}">${d.dow}</td>`+
+      `<td class="name muted">${esc(d.note.slice(0,26))}</td>`+
+      `<td class="num muted">${d.settles?d.settles.slice(5):'—'}</td>`;
+    t.appendChild(tr);
+  });
+  b.appendChild(t);
+}
+
+function holdingsPanel(b){
+  const t = el('table');
+  t.innerHTML='<tr><th>Symbol</th><th class="num">Qty</th><th class="num">Avg cost</th><th class="num">Book</th></tr>';
+  let total=0;
+  DATA.holdings.forEach(h=>{
+    total += h.book_cost;
+    const tr = el('tr');
+    tr.innerHTML = `<td class="${h.sharia==='compliant'?'ok':'warn'}" data-tip="${esc(h.name)} — sharia: ${esc(h.sharia)}">${esc(h.symbol)}</td>`+
+      `<td class="num">${h.qty.toLocaleString()}</td>`+
+      `<td class="num muted">${h.avg_cost.toFixed(2)}</td>`+
+      `<td class="num">${Math.round(h.book_cost).toLocaleString()}</td>`;
+    t.appendChild(tr);
+  });
+  b.appendChild(t);
+  b.appendChild(el('div','sub',`<br>Book cost ${Math.round(total).toLocaleString()} EGP · <span class="warn">no live prices until Phase 2</span>`));
+}
+
+function safetyPanel(b){
+  const s = DATA.safety;
+  const mode = s.execution_mode;
+  kv(b,'Execution', mode, mode==='alert'?'ok':(mode==='auto'?'bad':'warn'),
+     'alert = tickets only. assisted = pre-fills the ThndrX ticket and stops before confirm. auto = confirms itself.');
+  kv(b,'Live-trade ack', s.live_trading_ack?'set':'not set', s.live_trading_ack?'warn':'ok',
+     'Auto mode needs this second, independent switch so it cannot be reached by one typo.');
+  kv(b,'Max order', s.max_order_egp.toLocaleString()+' EGP', null, 'Hard cap on any single order, in every mode including auto.');
+  kv(b,'Confirm timeout', s.confirm_timeout_s+'s', null, 'An unconfirmed ticket expires. Expiry never means execute.');
+  kv(b,'Free trades/mo', String(s.free_trades), 'info', 'Thndr Trader allowance. Past this, 2 EGP + 0.1% per order.');
+  kv(b,'Max position', s.max_position_pct+'%', null);
+  kv(b,'Daily loss limit', s.daily_loss_limit_pct+'%', null, 'Trips the kill switch.');
+  kv(b,'Grandfathered', s.grandfather_existing?'yes':'no', s.grandfather_existing?'ok':'warn',
+     'Existing positions predate the bot. With this off, the risk engine would want to trim BIOC hard on the first run.');
+}
+
+function phasesPanel(b){
+  DATA.phases.forEach(p=>{
+    const d = el('div','phase '+p.state);
+    d.innerHTML = `<span class="n">${p.n}</span><span><span class="t">${esc(p.name)}</span> <span class="d">${esc(p.detail)}</span></span>`;
+    const badge = el('span','sub');
+    badge.style.marginLeft='auto';
+    badge.innerHTML = p.state==='done'?'<span class="ok">done</span>':(p.state==='blocked'?'<span class="warn">blocked</span>':'<span class="muted">todo</span>');
+    d.appendChild(badge);
+    b.appendChild(d);
+  });
+}
+
+/* ── tooltips ──────────────────────────────────────────── */
+function initTooltips(){
+  const tip = document.getElementById('tip');
+  let current = null;
+
+  function show(target){
+    const text = target.getAttribute('data-tip');
+    if(!text) return;
+    current = target;
+    tip.textContent = text;
+    tip.classList.add('on');
+    tip.setAttribute('aria-hidden','false');
+    place(target);
+  }
+
+  function place(target){
+    const r = target.getBoundingClientRect();
+    const t = tip.getBoundingClientRect();
+    const pad = 8;
+    // Prefer above; flip below when there is no room, and clamp horizontally so
+    // a tooltip near an edge stays fully on screen.
+    let top = r.top - t.height - pad;
+    if(top < pad) top = r.bottom + pad;
+    let left = r.left + r.width/2 - t.width/2;
+    left = Math.max(pad, Math.min(left, window.innerWidth - t.width - pad));
+    tip.style.top = top + 'px';
+    tip.style.left = left + 'px';
+  }
+
+  function hide(){
+    current = null;
+    tip.classList.remove('on');
+    tip.setAttribute('aria-hidden','true');
+  }
+
+  document.addEventListener('mouseover', e => {
+    const target = e.target.closest('[data-tip]');
+    if(target && target !== current) show(target);
+  });
+  document.addEventListener('mouseout', e => {
+    if(current && !current.contains(e.relatedTarget)) hide();
+  });
+  // Keyboard users get them too.
+  document.addEventListener('focusin', e => {
+    const target = e.target.closest && e.target.closest('[data-tip]');
+    if(target) show(target);
+  });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('scroll', () => { if(current) place(current); }, true);
+  window.addEventListener('resize', hide);
+}
+
+/* ── control panel ─────────────────────────────────────── */
+let deskState = null;
+
+async function deskCall(path, opts){
+  const sep = path.includes('?') ? '&' : '?';
+  const res = await fetch(path + sep + 't=' + encodeURIComponent(DESK_TOKEN), opts);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+function controlPanel(b){
+  if(!LIVE){
+    const d = el('div','notice');
+    d.appendChild(el('span','ico info','i'));
+    d.appendChild(el('span',null,
+      'This page is a static snapshot — it has no network access and cannot run anything. '+
+      'Start the desk with <b>egx desk</b> to get live controls.'));
+    b.appendChild(d);
+    return;
+  }
+  const host = el('div'); host.id = 'ctl-host';
+  b.appendChild(host);
+  renderControls(host);
+  if(!controlPanel._polling){
+    controlPanel._polling = true;
+    setInterval(refreshDesk, 1500);
+    refreshDesk();
+  }
+}
+
+async function refreshDesk(){
+  try { deskState = await deskCall('/api/status'); }
+  catch { deskState = null; }
+  const host = document.getElementById('ctl-host');
+  if(host) renderControls(host);
+}
+
+const STATE_STYLE = {
+  idle:['muted','·'], running:['info','▶'], done:['ok','✓'],
+  failed:['bad','✗'], needs_you:['warn','▲'],
+};
+
+function renderControls(host){
+  host.innerHTML = '';
+  if(!deskState){ host.appendChild(el('div','sub','connecting to the desk…')); return; }
+
+  const grid = el('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px';
+
+  for(const [name, spec] of Object.entries(deskState.specs)){
+    const run = deskState.actions[name] || {state:'idle', lines:[]};
+    const [cls, glyph] = STATE_STYLE[run.state] || ['muted','·'];
+    const running = run.state === 'running';
+
+    const card = el('div');
+    card.style.cssText =
+      'border:1px solid var(--line-soft);border-radius:8px;padding:9px 11px;background:var(--panel-2)';
+
+    const head = el('div');
+    head.style.cssText = 'display:flex;align-items:center;gap:7px;margin-bottom:5px';
+    head.innerHTML = `<span class="${cls}" style="font-family:var(--mono)">${glyph}</span>`+
+      `<span style="font-weight:600;font-size:12px">${esc(spec.label)}</span>`+
+      `<span class="sub" style="margin-left:auto">${esc(run.state.replace('_',' '))}</span>`;
+    card.appendChild(head);
+
+    const desc = el('div','sub'); desc.textContent = spec.description; card.appendChild(desc);
+
+    const btn = el('button','ui');
+    btn.style.marginTop = '7px';
+    btn.textContent = running ? 'Stop' : 'Run';
+    if(running) btn.classList.add('on');
+    btn.dataset.tip = spec.description;
+    btn.onclick = async () => {
+      if(!running && spec.confirm && !confirm(spec.confirm)) return;
+      btn.disabled = true;
+      try {
+        await deskCall((running ? '/api/stop' : '/api/run') + '?action=' + encodeURIComponent(name),
+                       {method:'POST'});
+      } catch(e){ alert('Could not reach the desk: ' + e.message); }
+      btn.disabled = false;
+      refreshDesk();
+    };
+    card.appendChild(btn);
+
+    if(run.message){
+      const m = el('div','sub warn'); m.style.marginTop='5px'; m.textContent = run.message;
+      card.appendChild(m);
+    }
+    grid.appendChild(card);
+  }
+  host.appendChild(grid);
+
+  const active = Object.entries(deskState.actions).find(([,r]) => r.lines && r.lines.length);
+  if(active){
+    const [name, run] = active;
+    const log = el('pre');
+    log.style.cssText =
+      'margin-top:10px;padding:9px 11px;border-radius:7px;background:#05080f;'+
+      'border:1px solid var(--line-soft);font-family:var(--mono);font-size:11px;'+
+      'line-height:1.5;color:var(--ink-2);max-height:150px;overflow:auto;white-space:pre-wrap';
+    log.textContent = run.lines.slice(-30).join('\n');
+    host.appendChild(el('div','sub','<br><b>'+esc(name)+'</b> output'));
+    host.appendChild(log);
+  }
+
+  host.appendChild(el('div','sub',
+    '<br><span class="ok">No order path.</span> The desk starts and stops jobs. '+
+    'Placing trades stays behind the execution-mode gates and per-order confirmation.'));
+}
+
+/* ── boot ──────────────────────────────────────────────── */
+function boot(){
+  const s = DATA.session;
+  $('#live-dot').classList.toggle('closed', !s.accepts_orders);
+  $('#p-session').innerHTML = `<b>${esc(s.phase.replace(/_/g,' '))}</b> ${esc(s.now_cairo)}`;
+  $('#p-session').className = 'pill ' + (s.accepts_orders?'ok':'');
+  const m = DATA.safety.execution_mode;
+  $('#p-mode').innerHTML = `mode <b>${esc(m)}</b>`;
+  $('#p-mode').className = 'pill ' + (m==='alert'?'ok':(m==='auto'?'bad':'warn'));
+  $('#p-mode').dataset.tip = m==='alert'
+    ? 'Alert mode: the system emits order tickets and never touches a browser. It cannot place an order.'
+    : 'This mode can interact with ThndrX. Check the safety panel.';
+  $('#p-universe').innerHTML = `universe <b>${esc(DATA.universe.mode)}</b> ${DATA.universe.sharia_count}`;
+  $('#p-universe').dataset.tip = 'Sharia mode admits only positively-labelled names; unknown is excluded alongside non-compliant.';
+  $('#f-gen').textContent = DATA.generated_at;
+  const fm = $('#f-mode');
+  if(LIVE){
+    fm.innerHTML = 'live desk · localhost only · <span class="ok">no order path</span> ' +
+      '<span class="help">?</span>';
+    fm.dataset.tip = 'Served by `egx desk` on 127.0.0.1 with a per-run token. It can ' +
+      'start and stop jobs. It cannot place, amend or cancel an order — that stays ' +
+      'behind the execution-mode gates and per-order confirmation.';
+  } else {
+    fm.innerHTML = 'static snapshot · no network · no order path <span class="help">?</span>';
+    fm.dataset.tip = 'Written by `egx dashboard`. It does not poll and cannot run ' +
+      'anything. Use `egx desk` for live controls.';
+  }
+  if(!DATA.calendar.coverage_ok)
+    $('#f-warn').textContent = '⚠ calendar coverage ends ' + DATA.calendar.verified_through;
+
+  document.querySelectorAll('[data-layout]').forEach(btn=>{
+    btn.onclick = ()=>{ layoutName = btn.dataset.layout; writeStore('egx.layout',layoutName); render(); };
+  });
+  $('#btn-reset').onclick = ()=>{ delete custom[layoutName];
+    writeStore('egx.custom',JSON.stringify(custom)); render(); };
+  $('#sw-lock').onclick = ()=>{ locked=!locked; writeStore('egx.locked', locked?'1':'0'); render(); };
+  let t; window.addEventListener('resize', ()=>{clearTimeout(t); t=setTimeout(render,120);});
+  initTooltips();
+  render();
+}
+
+try {
+  boot();
+} catch (err) {
+  document.getElementById('desk').innerHTML =
+    '<div class="notice warn" style="margin:20px"><span class="ico warn">!</span><span>' +
+    'Dashboard failed to render: <b>' + esc(err && err.message || err) + '</b><br>' +
+    'The snapshot data is intact — this is a rendering fault. Re-run <b>egx dashboard</b>.' +
+    '</span></div>';
+  throw err;
+}
+</script>
+</body>
+</html>
