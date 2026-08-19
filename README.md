@@ -5,7 +5,7 @@ measured before it is trusted.
 
 > **This is research software, not investment advice.** Backtest results are not
 > predictions. Automating a broker account may breach that broker's terms and put
-> the account at risk. See [LICENSE](LICENSE) for the full notice.
+> the account at risk. See [NOTICE.md](NOTICE.md).
 
 **Nothing in this repository can place an order.** The execution path is
 deliberately unfinished, and the parts that exist are gated behind explicit
@@ -166,5 +166,5 @@ than rediscovering it.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE), including the additional notice about financial
-software.
+MIT — see [LICENSE](LICENSE). [NOTICE.md](NOTICE.md) covers what that means
+for software that touches real money.

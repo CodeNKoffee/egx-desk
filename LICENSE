@@ -19,20 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-ADDITIONAL NOTICE — THIS SOFTWARE CONCERNS FINANCIAL MARKETS
-
-This is research and engineering software. It is not investment advice, and its
-authors are not licensed financial advisers. Nothing in this repository is a
-recommendation to buy or sell any security.
-
-Backtest results are not predictions. A strategy that performed well on
-historical data can and does lose money in live markets.
-
-Automating a broker account may breach that broker's terms of service and put
-the account at risk. That is the operator's responsibility to check, not the
-software's.
-
-You are solely responsible for any capital you deploy using this software.
