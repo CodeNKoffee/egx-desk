@@ -114,7 +114,7 @@ gantt
     dateFormat HH:mm
     axisFormat %H:%M
     section Phases
-    Pre-open (closes at random, 09:50–10:00)  :done,   po,  09:30, 30m
+    Pre-open — closes at a random moment    :done,   po,  09:30, 30m
     Continuous trading                        :active, ct,  10:00, 255m
     Closing auction                           :        ca,  14:15, 10m
     Trading-at-close                          :        tac, 14:25, 5m
