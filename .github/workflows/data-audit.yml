@@ -8,9 +8,14 @@ name: Data audit
 # settled into the feed, before the 09:30 pre-open. Cron day-of-week 0-4 is
 # Sun-Thu, matching EGX's trading week rather than a Mon-Fri assumption.
 #
-# Without the EGX_PROXY_KEY secret the job SKIPS rather than fails. A scheduled
-# job that goes red every weekday morning for a known-missing config just teaches
-# you to ignore CI. It only fails for a real regression in data coverage.
+# Without its configuration the job SKIPS rather than fails. A scheduled job that
+# goes red every weekday morning for a known-missing config just teaches you to
+# ignore CI. It only fails for a real regression in data coverage.
+#
+# "Its configuration" means BOTH EGX_PROXY_KEY and EGX_YAHOO_BASE_URL. Guarding
+# only the key is what made this job red every trading morning from 2026-08-19:
+# the Worker URL used to be a hardcoded default in config.py, and when that was
+# removed the guard still passed while Settings refused to load.
 on:
   schedule:
     - cron: "30 6 * * 0-4"
@@ -23,13 +28,24 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - name: Check whether the proxy key is configured
+      - name: Check whether the Yahoo Worker is configured
         id: guard
         env:
           PROXY_KEY: ${{ secrets.EGX_PROXY_KEY }}
+          YAHOO_BASE_URL: ${{ secrets.EGX_YAHOO_BASE_URL }}
+        # Separate `if` blocks rather than `[ -z "$X" ] && missing=...`: the step
+        # runs under `bash -e`, where a failing test as the last command of an
+        # && list aborts the step.
         run: |
+          missing=
           if [ -z "$PROXY_KEY" ]; then
-            echo "::warning title=Audit skipped::EGX_PROXY_KEY is not set, so the Yahoo Worker would reject every request. Add it under Settings -> Secrets -> Actions to enable this audit."
+            missing="EGX_PROXY_KEY"
+          fi
+          if [ -z "$YAHOO_BASE_URL" ]; then
+            missing="${missing:+$missing and }EGX_YAHOO_BASE_URL"
+          fi
+          if [ -n "$missing" ]; then
+            echo "::warning title=Audit skipped::$missing not set. The audit needs the Worker URL and its key; without both, Settings refuses to load. Add them under Settings -> Secrets and variables -> Actions."
             echo "configured=false" >> "$GITHUB_OUTPUT"
           else
             echo "configured=true" >> "$GITHUB_OUTPUT"
@@ -59,6 +75,7 @@ jobs:
         if: steps.guard.outputs.configured == 'true'
         env:
           EGX_PROXY_KEY: ${{ secrets.EGX_PROXY_KEY }}
+          EGX_YAHOO_BASE_URL: ${{ secrets.EGX_YAHOO_BASE_URL }}
         # Floor is 15%: the measured baseline on 2026-08-18 was 19% of the Sharia
         # universe passing. This catches degradation, it does not assert health —
         # 19% is itself the reason a second data source is needed.
